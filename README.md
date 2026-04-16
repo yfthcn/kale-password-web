@@ -4,6 +4,8 @@ Tamamen tarayıcıda çalışan, sunucuya hiçbir şey göndermeyen güvenli şi
 
 **[→ Canlı Demo](https://yfthcn.github.io/kale-password-web/)**
 
+---
+
 ## Özellikler
 
 - 🔐 **Şifre** — uzunluk, karakter seti, tekrarsız mod, belirsiz karakter hariç tutma
@@ -14,44 +16,51 @@ Tamamen tarayıcıda çalışan, sunucuya hiçbir şey göndermeyen güvenli şi
 - 🎨 Animasyonlu arka plan
 - ✅ Tamamen istemci tarafı — CDN yok, sunucu yok, veri transferi yok
 
-## Kurulum & Çalıştırma
-
-### Lokal
-
-```bash
-git clone https://github.com/kullaniciadiniz/kale.git
-cd kale
-# Herhangi bir statik sunucu:
-npx serve .
-# veya
-python3 -m http.server 8080
-```
-
-> ⚠️ `words.json` için `fetch()` kullandığından doğrudan `file://` ile açmak passphrase modunda fallback listeye düşer. Bir HTTP sunucusu üzerinden açmanız önerilir.
-
-### GitHub Pages
-
-1. Repoyu fork'la veya push'la
-2. **Settings → Pages → Branch: `main` / `(root)`** seç
-3. Kaydet — birkaç dakika içinde `https://kullaniciadiniz.github.io/kale` adresinde yayınlanır
+---
 
 ## Dosya Yapısı
 
 ```
-kale/
+kale-password-web/
 ├── index.html      # Ana sayfa
 ├── style.css       # Tüm stiller
 ├── app.js          # Üretici mantığı + UI
 ├── qr.js           # Sıfır bağımlılıklı QR encoder
-└── words.json      # Türkçe kelime listesi (~400 kelime)
+├── words.json      # Türkçe kelime listesi (~400 kelime)
+├── .nojekyll       # GitHub Pages Jekyll devre dışı
+└── README.md
 ```
+
+---
+
+## Lokal Çalıştırma
+
+Proje saf HTML/CSS/JS olduğundan herhangi bir derleme adımı gerekmez.  
+Ancak `words.json` dosyası `fetch()` ile yüklendiğinden, doğrudan `file://` ile açmak yerine bir HTTP sunucusu üzerinden çalıştırmanız önerilir.
+
+```bash
+git clone https://github.com/yfthcn/kale-password-web.git
+cd kale-password-web
+
+# Node.js varsa:
+npx serve .
+
+# Python varsa:
+python3 -m http.server 8080
+```
+
+Tarayıcıda `http://localhost:8080` adresini açın.
+
+---
 
 ## Güvenlik
 
-- `crypto.getRandomValues()` kullanır (CSPRNG)
-- Hiçbir şifre loglanmaz, saklanmaz veya iletilmez
-- Dış kaynak yok (Google Fonts hariç, isteğe bağlı kaldırılabilir)
+- Tüm rastgelelik `crypto.getRandomValues()` (CSPRNG) ile üretilir
+- Hiçbir şifre loglanmaz, saklanmaz veya dışarı iletilmez
+- Harici bağımlılık yoktur (Google Fonts isteğe bağlı kaldırılabilir)
+
+---
 
 ## Lisans
 
-MIT
+MIT © [yfthcn](https://github.com/yfthcn)
