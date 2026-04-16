@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>Kale — Güvenli Şifre Üreticisi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=IBM+Plex+Sans:wght@300;400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <canvas id="bg-canvas"></canvas>
+
+  <main class="container">
+
+    <!-- Header -->
+    <header class="header">
+      <div class="logo-row">
+        <div class="logo-mark">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <rect x="3" y="11" width="18" height="11" rx="2.5" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M7 11V7.5a5 5 0 0110 0V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <circle cx="12" cy="17" r="1.5" fill="currentColor"/>
+          </svg>
+        </div>
+        <span class="logo-text">Kale</span>
+        <span class="logo-version">v2</span>
+      </div>
+      <div class="trust-badge">
+        <span class="trust-dot"></span>
+        <span>Sunucuya hiçbir şey gönderilmez · CDN yok · tamamen tarayıcıda</span>
+      </div>
+    </header>
+
+    <!-- Mode Toggle -->
+    <div class="mode-toggle-wrap">
+      <button class="mode-btn active" data-mode="password">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        Şifre
+      </button>
+      <button class="mode-btn" data-mode="passphrase">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        İfade
+      </button>
+      <button class="mode-btn" data-mode="pin">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><circle cx="12" cy="17" r="1" fill="currentColor"/></svg>
+        PIN
+      </button>
+    </div>
+
+    <!-- OUTPUT — her zaman üstte -->
+    <div class="output-card" id="output-card">
+      <div class="output-meta-row">
+        <span class="output-label" id="output-label">ŞİFRE</span>
+        <div class="output-actions">
+          <button class="action-btn" id="btn-qr" title="QR Kod" style="display:none">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="3" height="3"/><rect x="19" y="14" width="2" height="2"/><rect x="14" y="19" width="2" height="2"/><rect x="18" y="18" width="3" height="3"/></svg>
+          </button>
+          <button class="action-btn" id="btn-refresh" title="Yenile">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+          </button>
+          <button class="action-btn" id="btn-copy" title="Kopyala">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="output-display">
+        <span class="output-placeholder" id="output-placeholder">üretiliyor_</span>
+        <div class="output-chars" id="output-chars" style="display:none"></div>
+      </div>
+
+      <div class="strength-row">
+        <div class="strength-segments" id="strength-segments">
+          <span class="seg"></span><span class="seg"></span>
+          <span class="seg"></span><span class="seg"></span>
+          <span class="seg"></span>
+        </div>
+        <span class="strength-label" id="strength-label">—</span>
+        <span class="strength-entropy" id="strength-entropy"></span>
+      </div>
+
+      <div class="legend-row" id="color-legend" style="display:none">
+        <span class="legend-item"><span class="leg-dot upper-dot"></span>Büyük</span>
+        <span class="legend-item"><span class="leg-dot lower-dot"></span>Küçük</span>
+        <span class="legend-item"><span class="leg-dot number-dot"></span>Rakam</span>
+        <span class="legend-item"><span class="leg-dot symbol-dot"></span>Sembol</span>
+      </div>
+    </div>
+
+    <!-- PASSWORD PANEL -->
+    <div class="panel active" id="panel-password">
+      <div class="section-label">UZUNLUK</div>
+      <div class="slider-card">
+        <div class="slider-header">
+          <span class="slider-val" id="pw-len-val">16</span>
+          <span class="slider-range-hint">4 — 128</span>
+        </div>
+        <div class="slider-wrap">
+          <input type="range" class="slider" id="password-length" min="4" max="128" value="16" />
+          <div class="slider-track-fill" id="pw-track-fill"></div>
+          <div class="slider-ticks" id="pw-ticks"></div>
+        </div>
+      </div>
+
+      <div class="two-col-settings">
+        <div class="settings-col">
+          <div class="section-label">KARAKTER</div>
+          <div class="toggle-grid">
+            <label class="toggle-card">
+              <input type="checkbox" id="use-upper" checked />
+              <div class="tc-inner"><span class="tc-dot upper-dot"></span><span class="tc-title">Büyük</span><span class="tc-sub">A–Z</span></div>
+              <span class="tc-check"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </label>
+            <label class="toggle-card">
+              <input type="checkbox" id="use-lower" checked />
+              <div class="tc-inner"><span class="tc-dot lower-dot"></span><span class="tc-title">Küçük</span><span class="tc-sub">a–z</span></div>
+              <span class="tc-check"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </label>
+            <label class="toggle-card">
+              <input type="checkbox" id="use-numbers" checked />
+              <div class="tc-inner"><span class="tc-dot number-dot"></span><span class="tc-title">Rakam</span><span class="tc-sub">0–9</span></div>
+              <span class="tc-check"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </label>
+            <label class="toggle-card">
+              <input type="checkbox" id="use-symbols" />
+              <div class="tc-inner"><span class="tc-dot symbol-dot"></span><span class="tc-title">Sembol</span><span class="tc-sub">!@#…</span></div>
+              <span class="tc-check"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="settings-col">
+          <div class="section-label">SEÇENEKLER</div>
+          <div class="opts-row">
+            <label class="opt-toggle">
+              <input type="checkbox" id="exclude-ambiguous" />
+              <span class="opt-track"><span class="opt-thumb"></span></span>
+              <span class="opt-label">Belirsiz hariç <em>l I O 0</em></span>
+            </label>
+            <label class="opt-toggle">
+              <input type="checkbox" id="no-repeat" />
+              <span class="opt-track"><span class="opt-thumb"></span></span>
+              <span class="opt-label">Tekrar etme</span>
+            </label>
+          </div>
+          <input type="text" class="exclude-input" id="custom-exclude"
+            placeholder="Hariç karakterler…" autocomplete="off" spellcheck="false" />
+        </div>
+      </div>
+    </div>
+
+    <!-- PASSPHRASE PANEL -->
+    <div class="panel" id="panel-passphrase">
+      <div class="section-label">KELİME SAYISI</div>
+      <div class="slider-card">
+        <div class="slider-header">
+          <span class="slider-val" id="pp-word-val">4</span>
+          <span class="slider-range-hint">3 — 8</span>
+        </div>
+        <div class="slider-wrap">
+          <input type="range" class="slider" id="pp-words" min="3" max="8" value="4" />
+          <div class="slider-track-fill" id="pp-track-fill"></div>
+          <div class="slider-ticks" id="pp-ticks"></div>
+        </div>
+      </div>
+
+      <div class="two-col-settings">
+        <div class="settings-col">
+          <div class="section-label">AYRAÇ</div>
+          <div class="opts-row separator-opts">
+            <label class="opt-toggle radio-as-toggle">
+              <input type="radio" name="pp-sep" value="-" checked />
+              <span class="opt-track"><span class="opt-thumb"></span></span>
+              <span class="opt-label">Tire &nbsp;<em>kale-dağ</em></span>
+            </label>
+            <label class="opt-toggle radio-as-toggle">
+              <input type="radio" name="pp-sep" value="." />
+              <span class="opt-track"><span class="opt-thumb"></span></span>
+              <span class="opt-label">Nokta &nbsp;<em>kale.dağ</em></span>
+            </label>
+            <label class="opt-toggle radio-as-toggle">
+              <input type="radio" name="pp-sep" value="_" />
+              <span class="opt-track"><span class="opt-thumb"></span></span>
+              <span class="opt-label">Alt çizgi &nbsp;<em>kale_dağ</em></span>
+            </label>
+            <label class="opt-toggle radio-as-toggle">
+              <input type="radio" name="pp-sep" value=" " />
+              <span class="opt-track"><span class="opt-thumb"></span></span>
+              <span class="opt-label">Boşluk &nbsp;<em>kale dağ</em></span>
+            </label>
+          </div>
+        </div>
+        <div class="settings-col">
+          <div class="section-label">SEÇENEKLER</div>
+          <div class="opts-row">
+            <label class="opt-toggle">
+              <input type="checkbox" id="pp-capitalize" checked />
+              <span class="opt-track"><span class="opt-thumb"></span></span>
+              <span class="opt-label">İlk harf büyük</span>
+            </label>
+            <label class="opt-toggle">
+              <input type="checkbox" id="pp-number" checked />
+              <span class="opt-track"><span class="opt-thumb"></span></span>
+              <span class="opt-label">Sona rakam ekle</span>
+            </label>
+          </div>
+          <div class="pp-info">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12" y2="16"/></svg>
+            Hatırlanması kolay, kırılması zor
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PIN PANEL -->
+    <div class="panel" id="panel-pin">
+      <div class="section-label">UZUNLUK</div>
+      <div class="slider-card">
+        <div class="slider-header">
+          <span class="slider-val" id="pin-len-val">6</span>
+          <span class="slider-range-hint">4 — 12</span>
+        </div>
+        <div class="slider-wrap">
+          <input type="range" class="slider" id="pin-length" min="4" max="12" value="6" />
+          <div class="slider-track-fill" id="pin-track-fill"></div>
+          <div class="slider-ticks" id="pin-ticks"></div>
+        </div>
+      </div>
+
+      <div class="two-col-settings">
+        <div class="settings-col">
+          <div class="section-label">BİÇİM</div>
+          <div class="opts-row">
+            <label class="opt-toggle radio-as-toggle">
+              <input type="radio" name="pin-type" value="numeric" checked />
+              <span class="opt-track"><span class="opt-thumb"></span></span>
+              <span class="opt-label">Sayısal (0–9)</span>
+            </label>
+            <label class="opt-toggle radio-as-toggle">
+              <input type="radio" name="pin-type" value="alpha" />
+              <span class="opt-track"><span class="opt-thumb"></span></span>
+              <span class="opt-label">Alfanümerik</span>
+            </label>
+          </div>
+        </div>
+        <div class="settings-col">
+          <div class="section-label">SEÇENEKLER</div>
+          <div class="opts-row">
+            <label class="opt-toggle">
+              <input type="checkbox" id="pin-no-seq" />
+              <span class="opt-track"><span class="opt-thumb"></span></span>
+              <span class="opt-label">Ardışık yok</span>
+            </label>
+            <label class="opt-toggle">
+              <input type="checkbox" id="pin-no-repeat" />
+              <span class="opt-track"><span class="opt-thumb"></span></span>
+              <span class="opt-label">Tekrar etme</span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- QR Modal -->
+  <div class="qr-overlay" id="qr-overlay" style="display:none">
+    <div class="qr-modal">
+      <div class="qr-modal-header">
+        <span class="qr-modal-title">QR Kod</span>
+        <button class="qr-close" id="qr-close">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <canvas id="qr-canvas"></canvas>
+      <p class="qr-hint">Telefonunuzla tarayın</p>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <a href="https://kaktusdev.net" target="_blank" rel="noopener" class="footer-link">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      kaktusdev.net
+    </a>
+  </footer>
+
+  <div class="toast" id="toast">Kopyalandı</div>
+  <script src="qr.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
