@@ -18,46 +18,11 @@ Tamamen tarayıcıda çalışan, sunucuya hiçbir şey göndermeyen güvenli şi
 
 ---
 
-## Dosya Yapısı
-
-```
-kale-password-web/
-├── index.html      # Ana sayfa
-├── style.css       # Tüm stiller
-├── app.js          # Üretici mantığı + UI
-├── qr.js           # Sıfır bağımlılıklı QR encoder
-├── words.json      # Türkçe kelime listesi (~400 kelime)
-├── .nojekyll       # GitHub Pages Jekyll devre dışı
-└── README.md
-```
-
----
-
-## Lokal Çalıştırma
-
-Proje saf HTML/CSS/JS olduğundan herhangi bir derleme adımı gerekmez.  
-Ancak `words.json` dosyası `fetch()` ile yüklendiğinden, doğrudan `file://` ile açmak yerine bir HTTP sunucusu üzerinden çalıştırmanız önerilir.
-
-```bash
-git clone https://github.com/yfthcn/kale-password-web.git
-cd kale-password-web
-
-# Node.js varsa:
-npx serve .
-
-# Python varsa:
-python3 -m http.server 8080
-```
-
-Tarayıcıda `http://localhost:8080` adresini açın.
-
----
-
 ## Güvenlik
 
 - Tüm rastgelelik `crypto.getRandomValues()` (CSPRNG) ile üretilir
 - Hiçbir şifre loglanmaz, saklanmaz veya dışarı iletilmez
-- Harici bağımlılık yoktur (Google Fonts isteğe bağlı kaldırılabilir)
+- Harici bağımlılık yoktur — her şey tarayıcıda çalışır
 
 ---
 
