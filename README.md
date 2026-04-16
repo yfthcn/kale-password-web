@@ -2,7 +2,7 @@
 
 Tamamen tarayıcıda çalışan, sunucuya hiçbir şey göndermeyen güvenli şifre üreticisi.
 
-**[→ Canlı Demo](https://kullaniciadiniz.github.io/kale)**
+**[→ Canlı Demo](https://yfthcn.github.io/kale-password-web/)**
 
 ## Özellikler
 
